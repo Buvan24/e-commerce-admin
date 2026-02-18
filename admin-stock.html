@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Stock - Admin</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        .admin-header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .admin-header h1 {
+            font-size: 24px;
+            color: #2D8B3C;
+            margin-bottom: 5px;
+        }
+        .alert-banner {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-banner strong {
+            color: #e65100;
+        }
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-box .icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .stat-box .value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .stat-box .label {
+            color: #666;
+            font-size: 14px;
+        }
+        .stat-box.danger .value {
+            color: #e53935;
+        }
+        .stat-box.warning .value {
+            color: #ff9800;
+        }
+        .stat-box.success .value {
+            color: #2D8B3C;
+        }
+        .filter-tabs {
+            background: white;
+            padding: 0;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active {
+            color: #2D8B3C;
+            border-bottom-color: #2D8B3C;
+        }
+        .stock-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background: #f5f5f5;
+        }
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+        tr:hover {
+            background: #f9f9f9;
+        }
+        .stock-level {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stock-bar {
+            flex: 1;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .stock-bar-fill {
+            height: 100%;
+            transition: width 0.3s;
+        }
+        .stock-bar-fill.low {
+            background: #e53935;
+        }
+        .stock-bar-fill.medium {
+            background: #ff9800;
+        }
+        .stock-bar-fill.high {
+            background: #2D8B3C;
+        }
+        .btn-order {
+            background: #2D8B3C;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .btn-order:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <div class="admin-header">
+            <a href="admin-dashboard.html" style="text-decoration: none; color: #666; font-size: 14px;">← Back to Dashboard</a>
+            <h1>📊 Stock Management</h1>
+        </div>
+
+        <!-- Alert Banner -->
+        <div class="alert-banner">
+            <span style="font-size: 24px;">⚠️</span>
+            <div>
+                <strong>23 products are running low on stock!</strong>
+                <span style="color: #666; margin-left: 10px;">Please reorder soon to avoid stockouts.</span>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-row">
+            <div class="stat-box danger">
+                <div class="icon">🔴</div>
+                <div class="value">23</div>
+                <div class="label">Low Stock (&lt;20)</div>
+            </div>
+            <div class="stat-box warning">
+                <div class="icon">🟡</div>
+                <div class="value">45</div>
+                <div class="label">Medium Stock (20-50)</div>
+            </div>
+            <div class="stat-box success">
+                <div class="icon">🟢</div>
+                <div class="value">274</div>
+                <div class="label">Good Stock (&gt;50)</div>
+            </div>
+            <div class="stat-box">
+                <div class="icon">📦</div>
+                <div class="value">342</div>
+                <div class="label">Total Products</div>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="filterStock('all')">All Products</button>
+                <button class="tab-btn" onclick="filterStock('low')">Low Stock</button>
+                <button class="tab-btn" onclick="filterStock('medium')">Medium Stock</button>
+                <button class="tab-btn" onclick="filterStock('high')">High Stock</button>
+            </div>
+        </div>
+
+        <!-- Stock Table -->
+        <div class="stock-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Current Stock</th>
+                        <th>Stock Level</th>
+                        <th>Manufacturer</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="stockTableBody">
+                    <tr data-stock-level="low">
+                        <td><strong>Fortune Sunflower Oil</strong></td>
+                        <td>Cooking Oil</td>
+                        <td>12 units</td>
+                        <td>
+                            <div class="stock-level">
+                                <div class="stock-bar">
+                                    <div class="stock-bar-fill low" style="width: 15%"></div>
+                                </div>
+                                <span style="color: #e53935; font-weight: 600;">15%</span>
+                            </div>
+                        </td>
+                        <td>Adani Wilmar Ltd</td>
+                        <td>
+                            <button class="btn-order" onclick="orderFromManufacturer('Fortune Sunflower Oil')">
+                                📧 Order Stock
+                            </button>
+                        </td>
+                    </tr>
+                    <tr data-stock-level="low">
+                        <td><strong>Parle-G Biscuits</strong></td>
+                        <td>Snacks</td>
+                        <td>8 units</td>
+                        <td>
+                            <div class="stock-level">
+                                <div class="stock-bar">
+                                    <div class="stock-bar-fill low" style="width: 10%"></div>
+                                </div>
+                                <span style="color: #e53935; font-weight: 600;">10%</span>
+                            </div>
+                        </td>
+                        <td>Parle Products</td>
+                        <td>
+                            <button class="btn-order" onclick="orderFromManufacturer('Parle-G Biscuits')">
+                                📧 Order Stock
+                            </button>
+                        </td>
+                    </tr>
+                    <tr data-stock-level="medium">
+                        <td><strong>Sona Masoori Rice</strong></td>
+                        <td>Rice & Grains</td>
+                        <td>45 units</td>
+                        <td>
+                            <div class="stock-level">
+                                <div class="stock-bar">
+                                    <div class="stock-bar-fill medium" style="width: 45%"></div>
+                                </div>
+                                <span style="color: #ff9800; font-weight: 600;">45%</span>
+                            </div>
+                        </td>
+                        <td>Sri Venkateshwara Mills</td>
+                        <td>
+                            <button class="btn-order" onclick="orderFromManufacturer('Sona Masoori Rice')">
+                                📧 Order Stock
+                            </button>
+                        </td>
+                    </tr>
+                    <tr data-stock-level="high">
+                        <td><strong>Tata Salt</strong></td>
+                        <td>Salt & Sugar</td>
+                        <td>120 units</td>
+                        <td>
+                            <div class="stock-level">
+                                <div class="stock-bar">
+                                    <div class="stock-bar-fill high" style="width: 85%"></div>
+                                </div>
+                                <span style="color: #2D8B3C; font-weight: 600;">85%</span>
+                            </div>
+                        </td>
+                        <td>Tata Chemicals</td>
+                        <td>
+                            <button class="btn-order" disabled>Stock OK</button>
+                        </td>
+                    </tr>
+                    <tr data-stock-level="low">
+                        <td><strong>MDH Garam Masala</strong></td>
+                        <td>Spices</td>
+                        <td>15 units</td>
+                        <td>
+                            <div class="stock-level">
+                                <div class="stock-bar">
+                                    <div class="stock-bar-fill low" style="width: 18%"></div>
+                                </div>
+                                <span style="color: #e53935; font-weight: 600;">18%</span>
+                            </div>
+                        </td>
+                        <td>MDH Spices</td>
+                        <td>
+                            <button class="btn-order" onclick="orderFromManufacturer('MDH Garam Masala')">
+                                📧 Order Stock
+                            </button>
+                        </td>
+                    </tr>
+                    <tr data-stock-level="high">
+                        <td><strong>Lifebuoy Soap</strong></td>
+                        <td>Personal Care</td>
+                        <td>95 units</td>
+                        <td>
+                            <div class="stock-level">
+                                <div class="stock-bar">
+                                    <div class="stock-bar-fill high" style="width: 75%"></div>
+                                </div>
+                                <span style="color: #2D8B3C; font-weight: 600;">75%</span>
+                            </div>
+                        </td>
+                        <td>Hindustan Unilever</td>
+                        <td>
+                            <button class="btn-order" disabled>Stock OK</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Check admin login
+        if (!sessionStorage.getItem('isAdmin')) {
+            window.location.href = 'admin-login.html';
+        }
+
+        function filterStock(level) {
+            // Update active tab
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Filter rows
+            const rows = document.querySelectorAll('#stockTableBody tr');
+            rows.forEach(row => {
+                const stockLevel = row.getAttribute('data-stock-level');
+                if (level === 'all' || stockLevel === level) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function orderFromManufacturer(productName) {
+            // Redirect to order page with product pre-selected
+            window.location.href = `admin-order-stock.html?product=${encodeURIComponent(productName)}`;
+        }
+    </script>
+</body>
+</html>

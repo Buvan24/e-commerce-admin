@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Orders - Admin</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        .admin-header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .admin-header h1 {
+            font-size: 24px;
+            color: #2D8B3C;
+        }
+        .filter-tabs {
+            background: white;
+            padding: 0;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active {
+            color: #2D8B3C;
+            border-bottom-color: #2D8B3C;
+        }
+        .orders-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background: #f5f5f5;
+        }
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+        tr:hover {
+            background: #f9f9f9;
+        }
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-pending {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        .status-processing {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        .status-delivered {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .status-cancelled {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .btn-status {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            background: #2D8B3C;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <div class="admin-header">
+            <a href="admin-dashboard.html" style="text-decoration: none; color: #666; font-size: 14px;">← Back to Dashboard</a>
+            <h1>📋 Customer Orders</h1>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="filterOrders('all')">All Orders</button>
+                <button class="tab-btn" onclick="filterOrders('pending')">Pending</button>
+                <button class="tab-btn" onclick="filterOrders('processing')">Processing</button>
+                <button class="tab-btn" onclick="filterOrders('delivered')">Delivered</button>
+            </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="orders-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Shop Name</th>
+                        <th>Date</th>
+                        <th>Items</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    <tr data-status="pending">
+                        <td><strong>#145823</strong></td>
+                        <td>Ramesh Kumar</td>
+                        <td>Sri Lakshmi Stores</td>
+                        <td>Feb 10, 2026</td>
+                        <td>4 items</td>
+                        <td><strong>₹8,036</strong></td>
+                        <td><span class="status-badge status-pending">Pending</span></td>
+                        <td>
+                            <button class="btn-status" onclick="updateOrderStatus(145823, 'processing')">Mark Processing</button>
+                        </td>
+                    </tr>
+                    <tr data-status="processing">
+                        <td><strong>#145698</strong></td>
+                        <td>Suresh Patel</td>
+                        <td>New Bharat Store</td>
+                        <td>Feb 9, 2026</td>
+                        <td>7 items</td>
+                        <td><strong>₹12,450</strong></td>
+                        <td><span class="status-badge status-processing">Processing</span></td>
+                        <td>
+                            <button class="btn-status" onclick="updateOrderStatus(145698, 'delivered')">Mark Delivered</button>
+                        </td>
+                    </tr>
+                    <tr data-status="delivered">
+                        <td><strong>#145421</strong></td>
+                        <td>Kumar Swamy</td>
+                        <td>Tamil Nadu Traders</td>
+                        <td>Feb 8, 2026</td>
+                        <td>5 items</td>
+                        <td><strong>₹9,800</strong></td>
+                        <td><span class="status-badge status-delivered">Delivered</span></td>
+                        <td>-</td>
+                    </tr>
+                    <tr data-status="pending">
+                        <td><strong>#145203</strong></td>
+                        <td>Vijay Kumar</td>
+                        <td>City Supermarket</td>
+                        <td>Feb 7, 2026</td>
+                        <td>3 items</td>
+                        <td><strong>₹6,200</strong></td>
+                        <td><span class="status-badge status-pending">Pending</span></td>
+                        <td>
+                            <button class="btn-status" onclick="updateOrderStatus(145203, 'processing')">Mark Processing</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Check admin login
+        if (!sessionStorage.getItem('isAdmin')) {
+            window.location.href = 'admin-login.html';
+        }
+
+        function filterOrders(status) {
+            // Update active tab
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Filter rows
+            const rows = document.querySelectorAll('#ordersTableBody tr');
+            rows.forEach(row => {
+                const rowStatus = row.getAttribute('data-status');
+                if (status === 'all' || rowStatus === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            if (confirm(`Update order #${orderId} to ${newStatus}?`)) {
+                alert(`Order #${orderId} marked as ${newStatus}!`);
+                // In production, update via API and refresh
+            }
+        }
+    </script>
+</body>
+</html>
